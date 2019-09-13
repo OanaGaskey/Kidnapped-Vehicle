@@ -30,7 +30,34 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    * NOTE: Consult particle_filter.h for more information about this method 
    *   (and others in this file).
    */
-  num_particles = 0;  // TODO: Set the number of particles
+  // use a random numer generator
+  std::default_random_engine gen;
+  
+  // create a normal (Gaussian) distribution for x, y and theta
+  std::normal_distribution<double> dist_x(x, std[0]);
+  std::normal_distribution<double> dist_y(y, std[1]);
+  std::normal_distribution<double> dist_theta(theta, std[2]);
+  
+  // number chosen to match one particle/cm^2 in hypothetical uniform distribution across a rectangle of stddev_x * stddev_y 
+  num_particles = 10;//00;  // TODO: Set the number of particles
+  
+  //loop over the total number of particles and initialize x, y and theta based on normal distribution around the GPS measurement
+  for (int i = 0; i < num_particles; ++i) {
+    //declare a particle of structure Particle
+    Particle newparticle;
+    //index i used for particle id
+    newparticle.id     = i;
+    newparticle.x      = dist_x(gen); 
+    newparticle.y      = dist_y(gen);
+    newparticle.theta  = dist_theta(gen);
+    newparticle.weight = 1.0;
+    // Print your samples to the terminal.
+    std::cout << "Sample " << i + 1 << " " << newparticle.x << " " << newparticle.y << " " 
+              << newparticle.theta << std::endl;
+    //store the particle in the particles vector   
+    particles.push_back(newparticle);
+  }
+  is_initialized = 1;
 
 }
 
