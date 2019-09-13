@@ -17,6 +17,8 @@
 #include <vector>
 
 #include "helper_functions.h"
+#define PI 3.14159265
+# define delta 0.0001
 
 using std::string;
 using std::vector;
@@ -39,7 +41,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   std::normal_distribution<double> dist_theta(theta, std[2]);
   
   // number chosen to match one particle/cm^2 in hypothetical uniform distribution across a rectangle of stddev_x * stddev_y 
-  num_particles = 10;//00;  // TODO: Set the number of particles
+  num_particles = 1000;  // TODO: Set the number of particles
   
   //loop over the total number of particles and initialize x, y and theta based on normal distribution around the GPS measurement
   for (int i = 0; i < num_particles; ++i) {
@@ -52,10 +54,11 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
     newparticle.theta  = dist_theta(gen);
     newparticle.weight = 1.0;
     // Print your samples to the terminal.
-    std::cout << "Sample " << i + 1 << " " << newparticle.x << " " << newparticle.y << " " 
-              << newparticle.theta << std::endl;
+    //std::cout << "Sample " << i + 1 << " " << newparticle.x << " " << newparticle.y << " " 
+    //          << newparticle.theta << std::endl;
     //store the particle in the particles vector   
     particles.push_back(newparticle);
+    weights.push_back(1.0);
   }
   is_initialized = 1;
 
@@ -70,7 +73,47 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
    *  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
    *  http://www.cplusplus.com/reference/random/default_random_engine/
    */
-
+  
+  // use a random numer generator
+  std::default_random_engine gen;
+  
+  //loop over all particles and predict final x, y and theta after dt
+  for (int i = 0; i < num_particles; ++i) {
+    double x_0 = particles[i].x;
+    double x_f;
+    double y_0 = particles[i].y;
+    double y_f;
+    double theta_0 = particles[i].theta;
+    double theta_f;
+    
+    //if yaw rate very small approximate to 0 and avoid divion by zero or overflow
+    if (std::abs(yaw_rate) < delta) {
+      //calculate x, y and theta final given the velocity, time elapsed and no yaw_rate
+      theta_f = theta_0;
+      x_f = x_0 + (velocity * cos(theta_0) * delta_t);
+      y_f = y_0 + (velocity * sin(theta_0) * delta_t);
+    }
+    else{
+      //calculate theta final given the yaw rate and the time elapsed
+      theta_f = theta_0 + (yaw_rate * delta_t);
+      //assure that theta is between 0 and 2*PI
+      if (theta_f >= 2*PI){ theta_f = theta_f - 2*PI; }
+      if (theta_f < 0.0 ) { theta_f = theta_f + 2*PI; }
+      //calculate x and y final given the velocity, yaw rate and the time elapsed
+      x_f = x_0 + ( (velocity/yaw_rate) * (sin(theta_f) - sin(theta_0)) );
+      y_f = y_0 + ( (velocity/yaw_rate) * (cos(theta_0) - cos(theta_f)) );
+    }
+       
+    // create a normal (Gaussian) distribution for x_f, y_f and theta_f
+    std::normal_distribution<double> dist_x(x_f, std_pos[0]);
+    std::normal_distribution<double> dist_y(y_f, std_pos[1]);
+    std::normal_distribution<double> dist_theta(theta_f, std_pos[2]);
+    // generate final position and angle given the Gaussian distribution
+    particles[i].x     = dist_x(gen);
+    particles[i].y     = dist_y(gen);
+    particles[i].theta = dist_theta(gen);
+  }
+  
 }
 
 void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted, 
