@@ -15,9 +15,8 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <limits>
 
-#include "helper_functions.h"
-#define PI 3.14159265
 # define delta 0.0001
 
 using std::string;
@@ -46,18 +45,18 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   //loop over the total number of particles and initialize x, y and theta based on normal distribution around the GPS measurement
   for (int i = 0; i < num_particles; ++i) {
     //declare a particle of structure Particle
-    Particle newparticle;
+    Particle particle;
     //index i used for particle id
-    newparticle.id     = i;
-    newparticle.x      = dist_x(gen); 
-    newparticle.y      = dist_y(gen);
-    newparticle.theta  = dist_theta(gen);
-    newparticle.weight = 1.0;
+    particle.id     = i;
+    particle.x      = dist_x(gen); 
+    particle.y      = dist_y(gen);
+    particle.theta  = dist_theta(gen);
+    particle.weight = 1.0;
     // Print your samples to the terminal.
-    //std::cout << "Sample " << i + 1 << " " << newparticle.x << " " << newparticle.y << " " 
-    //          << newparticle.theta << std::endl;
+    //std::cout << "Sample " << i + 1 << " " << particle.x << " " << particle.y << " " 
+    //          << particle.theta << std::endl;
     //store the particle in the particles vector   
-    particles.push_back(newparticle);
+    particles.push_back(particle);
     weights.push_back(1.0);
   }
   is_initialized = 1;
@@ -97,8 +96,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
       //calculate theta final given the yaw rate and the time elapsed
       theta_f = theta_0 + (yaw_rate * delta_t);
       //assure that theta is between 0 and 2*PI
-      if (theta_f >= 2*PI){ theta_f = theta_f - 2*PI; }
-      if (theta_f < 0.0 ) { theta_f = theta_f + 2*PI; }
+      if (theta_f >= 2*M_PI){ theta_f = theta_f - 2*M_PI; }
+      if (theta_f < 0.0 ) { theta_f = theta_f + 2*M_PI; }
       //calculate x and y final given the velocity, yaw rate and the time elapsed
       x_f = x_0 + ( (velocity/yaw_rate) * (sin(theta_f) - sin(theta_0)) );
       y_f = y_0 + ( (velocity/yaw_rate) * (cos(theta_0) - cos(theta_f)) );
@@ -126,6 +125,22 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   probably find it useful to implement this method and use it as a helper 
    *   during the updateWeights phase.
    */
+  //loop over all observations
+  for (unsigned int i = 0; i < observations.size(); ++i){
+    //initialize shortest distance from an observation to a landmark with the maximum value for double data type
+    double shortest_dist = std::numeric_limits<double>::max();
+    double current_dist;
+    //loop over all predicted observable landmarks
+    for (unsigned int j = 0; j < predicted.size(); ++j){
+      //calculate the distance from observation i to landmark j
+      current_dist = dist(observations[i].x, observations[i].y, predicted[j].x, predicted[j].y);
+      //if this is the shortest distance yet found, store the value locally and record the landmark id in the LandmarkObs structure
+      if (current_dist < shortest_dist) {
+        shortest_dist = current_dist;
+        observations[i].id = predicted[j].id;
+      }   
+    }
+  }
 
 }
 
@@ -145,7 +160,43 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
    *   and the following is a good resource for the actual equation to implement
    *   (look at equation 3.33) http://planning.cs.uiuc.edu/node99.html
    */
-
+  //transform observations from particle coordinates to map coordinates
+  //loop over all particles and all observations to apply transformation: translation and rotation
+  for (int i = 0; i < num_particles; ++i) {
+    vector<LandmarkObs> observations_map;
+    for (unsigned int j = 0; j < observations.size(); ++j){
+      LandmarkObs observation_map;
+      observation_map.x = particles[i].x + (cos(particles[i].theta) * observations[j].x) - (sin(particles[i].theta) * observations[j].y);
+      observation_map.y = particles[i].y + (sin(particles[i].theta) * observations[j].x) + (cos(particles[i].theta) * observations[j].y);
+      observation_map.id = 0; // don't associate this observation with any landmark id yet
+      observations_map.push_back(observation_map);
+    }
+    //predict the observable landmarks from particle i given the map and sensor range
+    vector<LandmarkObs> predicted_observations;
+    for (unsigned int j = 0; j < map_landmarks.landmark_list.size(); ++j){
+      LandmarkObs observable_landmark;
+      if (dist(particles[i].x, particles[i].y, double(map_landmarks.landmark_list[j].x_f), double(map_landmarks.landmark_list[j].y_f)) <= sensor_range){
+        observable_landmark.x  = double(map_landmarks.landmark_list[j].x_f);
+        observable_landmark.y  = double(map_landmarks.landmark_list[j].y_f);
+        observable_landmark.id = map_landmarks.landmark_list[j].id_i;
+        predicted_observations.push_back(observable_landmark);
+      }
+    }
+    
+    //associate observations with landmarks based on nearest neighbor principle
+    //this function will fill in the id in each observation corresponding to the closest map landmark
+    dataAssociation (predicted_observations, observations_map);
+        
+    //calculate the particle's new weight
+    double weight = 1.0;
+    for (unsigned int j = 0; j < observations_map.size(); ++j){ 
+      weight *= multivatiate_prob(std_landmark[0], std_landmark[1], observations_map[j].x, observations_map[j].y, 
+                            	  double(map_landmarks.landmark_list[observations_map[j].id].x_f), double(map_landmarks.landmark_list[observations_map[j].id].y_f));
+    }
+    particles[i].weight = weight;
+    weights[i] = weight;
+  }
+  
 }
 
 void ParticleFilter::resample() {
