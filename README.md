@@ -20,18 +20,43 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
 
  This means that the self driving car has _seen_ the streets before driving on them.
 
- ##Particle Filter
+ # Particle Filter
+
  Based on [Bayes Theorem](https://en.wikipedia.org/wiki/Bayes%27_theorem) the [Particle Filter](https://en.wikipedia.org/wiki/Particle_filter) takes a probabilistic approach on possible positions of where the car could be and calculates the probability density.
 
- The particles are possible vechile positions, as the vehicle doesn't know where it is located. You spread them around on the map and calculate their likelyhood. Each time the vehicle senses the world around, it measures its distance to known landmarks. 
+ The particles are possible vechile positions, as the vehicle doesn't know where it is located. You spread the particles around on the map and calculate their likelyhood. Each time the vehicle senses the world around, it measures its distance to known landmarks. 
 
- These distances are used to identify particles that are likely to be positioned at those distances from the landmarks. Particles that have higher likelyhoods are kept and can replace the ones that are unlikely, keeping the total number of particles constant. 
+ These distances are used to identify the particles that are likely to be positioned at those distances from the landmarks. Particles that have higher likelyhoods are kept and can replace the ones that are unlikely, keeping the total number of particles constant. 
 
  With this approach you start with _N_ particles that are spread all over the map and as the vechicle moves around and senses the world, the _N_ particles tend to gravitate around the car forming a dense cloud.
 
- ##Initialization
- ##Prediction
- ##Measurement
- ##Resampling 
+ ![ParticleDistribution](images/ParticleDistribution.JPG)
 
-# Implementation
+ # Implementation
+
+ This project is implemented in C++, the source code can be found in the ```src``` folder above. The started code for this project is provided by Udacity and can be found [here](https://github.com/udacity/CarND-Kidnapped-Vehicle-Project).
+
+ The files in which the logic of the particle filter is implemented are:
+ - particle_filter.cpp
+ - particle_filter.h
+ - helper_functions.h
+
+
+ - **Initialization**
+
+
+ - **Prediction**
+
+
+ - **Measurement**
+
+
+ - **Resampling**
+
+
+ - **Simulation** 
+ 
+
+ To download the simulator go [here](https://github.com/udacity/self-driving-car-sim/releases).
+
+ 
