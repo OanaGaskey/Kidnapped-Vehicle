@@ -24,7 +24,7 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
 
  The particles are possible vechile positions, as the vehicle doesn't know where it is located. You spread the particles around on the map and calculate their likelihood. Each time the vehicle senses the world around, it measures its distance to known landmarks. 
 
- These distances are used to identify the particles that are likely to be positioned at those distances from the landmarks. Particles that have higher likelihoods are kept and can replace the ones that are unlikely, keeping the total number of particles constant. 
+ The sensor measurements are used to identify the particles that are likely to be positioned at those distances from the landmarks. Particles that have higher likelihoods are kept and can replace the ones that are unlikely, keeping the total number of particles constant. 
 
  With this approach you start with _N_ particles that are spread all over the map and as the vechicle moves around and senses the world, the _N_ particles tend to gravitate around the car forming a dense cloud.
 
