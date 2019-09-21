@@ -141,13 +141,14 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
    //generate particle using discrete distribution
    resampled_particles.push_back(particles[d(gen)]);
  }
- particles = resampled_particles;
+ particles = std::move(resampled_particles);
  ```
 
 
- ## Simulation
+ ## Simulation Video
 
 [![KidnappedVehicleSimulation](https://img.youtube.com/vi/_t193faWlYE/0.jpg)](https://www.youtube.com/watch?v=_t193faWlYE)
+ Click on the image to see the video!
 
  In the simulation you can see the error between the _ground truth_ and the Particle Filter localization result is below 12 centimeters on each x and y axis and the orientation error is below 0.007 radians.
 

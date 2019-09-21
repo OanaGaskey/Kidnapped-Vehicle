@@ -3,6 +3,7 @@
  *
  * Created on: Dec 12, 2016
  * Author: Tiffany Huang
+ *         Oana Gaskey 
  */
 
 #include "particle_filter.h"
@@ -203,7 +204,7 @@ void ParticleFilter::resample() {
     //generate particle using discrete distribution
     resampled_particles.push_back(particles[d(gen)]);
   }
-  particles = resampled_particles;
+  particles = std::move(resampled_particles);
 }
 
 void ParticleFilter::SetAssociations(Particle& particle, 
