@@ -32,7 +32,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    * NOTE: Consult particle_filter.h for more information about this method 
    *   (and others in this file).
    */
-  // use a random numer generator
+  // use a random number generator
   default_random_engine gen;
   
   // create a normal (Gaussian) distribution for x, y and theta
@@ -40,7 +40,6 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   normal_distribution<double> dist_y(y, std[1]);
   normal_distribution<double> dist_theta(theta, std[2]);
   
-  // number chosen to match one particle/cm^2 in hypothetical uniform distribution across a rectangle of stddev_x * stddev_y 
   num_particles = 100;  // TODO: Set the number of particles
   
   //loop over the total number of particles and initialize x, y and theta based on normal distribution around the GPS measurement
