@@ -40,7 +40,7 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
  - helper_functions.h
 
 
- - **Initialization**
+ ## Initialization
 
  This is where the number of particules _N_ is defined and particules are spread all over the map. 
 
@@ -59,7 +59,7 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
   normal_distribution<double> dist_theta(theta, std[2]);
  ```
 
- - **Prediction**
+ ## Prediction
 
  The prediction and measurement steps are to be executed cyclically every time the vehicle moves and senses the world around. 
 
@@ -83,7 +83,7 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
  Since it's known for vehicles not to have perfect movement given a set of controls (_v_ and _yaw rate_) I added a Gaussian noise to the final position and orientation to make the model more plausible. 
 
 
- - **Measurement**
+ ## Measurement
 
  In the measurement step, the vehicle senses the world around and calculates the likelihood of each particle to represent the real position of the car on the map.
 
@@ -121,7 +121,7 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
   Since each measurement could imply multiple observations, meaning that more than one landmark is observable from one location, the final weight of the particle is the product of all observations' weights.
 
 
- - **Resampling**
+ ## Resampling
 
  At this point all particles' weights have been updated given the measurement. Some particles have higher weights, which means that the vehicle is more likely to be in one of those locations. Other particles have lower weights, meaning that they are further from the real position of the car on the map.
 
@@ -145,8 +145,13 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
  ```
 
 
- - **Simulation** 
+ ## Simulation
 
+[![KidnappedVehicleSimulation](https://img.youtube.com/vi/_t193faWlYE/0.jpg)](https://www.youtube.com/watch?v=_t193faWlYE)
+
+ In the simulation you can see the error between the _ground truth_ and the Particle Filter localization result is below 12 centimeters on each x and y axis and the orientation error is below 0.007 radians.
+
+ The black circles with xes are the map landmarks. The blue car with the green laser sensors represents the ground truth and the real measurements. The blue circle marks the vehicle's localization position using the Particle Filter and the blue laser sensors show how the landmarks are perceived from the particle's point of view.
 
  To download the simulator go [here](https://github.com/udacity/self-driving-car-sim/releases).
 
