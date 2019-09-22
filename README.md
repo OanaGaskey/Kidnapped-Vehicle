@@ -12,7 +12,7 @@ Particle Filter algorithm to localize a vehicle within a few centimeters, given 
 
  ![LidarMeasurements](images/LidarMeasurements.JPG)
 
- To be able to localize itself, a self driving car needs to sense the world around. Since the most accurate sensor for distance measurement is the LiDAR, this is the way to go. 
+ To be able to localize itself, a self driving car needs to sense the world around. Since the most accurate sensor for distance measurement is the high resolution LiDAR, this is the way to go. One popular supplier for high resolution LiDAR is [Velodyne](https://velodynelidar.com/industry-automotive.html) 
 
  The self driving car also needs a map, but this is no usual map like in traditional navigation systems. The map that proves to be most useful is one made of landmark positions. The self driving car will rely on knowing where a building, stop sign, or light pole is in a given intersection, and then when measuring its distance to those landmarks is able to localize itself.
 
