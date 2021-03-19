@@ -65,7 +65,7 @@ inline double dist(double x1, double y1, double x2, double y2) {
  * @param (mu_x,mu_y)   x and y mean values 
  * @output weight as observation likelihood
  */
-double multivatiate_prob(double sig_x, double sig_y, double x_obs, double y_obs,
+inline double multivariate_prob(double sig_x, double sig_y, double x_obs, double y_obs,
                   		 double mu_x, double mu_y) {
   // calculate normalization term
   double gauss_norm;
