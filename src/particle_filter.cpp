@@ -164,7 +164,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       double n_n_ldmk_y = map_landmarks.landmark_list[association].y_f;
       
       // Calculate multi-variate Gaussian distribution
-      particle_weight *= multivar_prob(std_landmark[0], std_landmark[1], obs_map_x, obs_map_y, n_n_ldmk_x, n_n_ldmk_y);
+      particle_weight *= multivariate_prob(std_landmark[0], std_landmark[1], obs_map_x, obs_map_y, n_n_ldmk_x, n_n_ldmk_y);
              
       //associations used for debugging
       associations.push_back(association+1);
